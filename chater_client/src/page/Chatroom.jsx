@@ -128,7 +128,7 @@ export default function Chatroom() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch("http://localhost:3001/upload", {
+    const response = await fetch("https://chat-room-nj2t.onrender.com/upload", {
       method: "POST",
       body: formData,
     });
@@ -244,7 +244,7 @@ export default function Chatroom() {
           <button className="chatbutton">^</button>
           <div className="abar">
             <label htmlFor="uplodeimage">
-              <img src="../../public/icon/image-gallery.png" />
+              <img src="/icon/image-gallery.png" />
               <input
                 type="file"
                 id="uplodeimage"
@@ -254,7 +254,7 @@ export default function Chatroom() {
               />
             </label>
             <label htmlFor="uplodeivideo">
-              <img src="../../public/icon/video.png" />
+              <img src="/icon/video.png" />
               <input
                 type="file"
                 id="uplodeivideo"
@@ -264,7 +264,7 @@ export default function Chatroom() {
               />
             </label>
             <label htmlFor="uplodeaudio">
-              <img src="../../public/icon/equalizer.png" />
+              <img src="/icon/equalizer.png" />
               <input
                 type="file"
                 id="uplodeaudio"

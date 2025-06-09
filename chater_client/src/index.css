@@ -24,7 +24,8 @@ body{
 
 
 .home{
-  background-color: rgb(44, 44, 44);
+  background-color: transparent;
+  border: 1px solid white;
   border-radius: 10px;
   max-width: var(--max-width);
   margin: 1px auto;

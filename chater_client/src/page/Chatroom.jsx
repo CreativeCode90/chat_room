@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import "./Chatroom.css";
 import { io } from "socket.io-client";
 
-const socket = io.connect("https://chatter-server-xpoi.onrender.com");
+const socket = io.connect("http://localhost:3001");
 
 export default function Chatroom() {
   const { username, roomId } = useParams();
@@ -120,6 +120,34 @@ export default function Chatroom() {
     setMessage("");
     inputRef.current?.focus(); // 👈 Focus input again
   };
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("http://localhost:3001/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    // Send the file URL via socket
+    const message = {
+      sender: username,
+      text: data.fileUrl, // URL of uploaded file
+      type: file.type.startsWith("image/")
+        ? "image"
+        : file.type.startsWith("video/")
+        ? "video"
+        : "audio",
+      sendAt: new Date().toLocaleTimeString(),
+    };
+
+    socket.emit("send_message", { MessageSender: message, roomId });
+  };
 
   return (
     <div className="chatroom">
@@ -172,7 +200,15 @@ export default function Chatroom() {
                     </b>
                   </div>
                   <div className="chattext">
-                    <p>{msg.text}</p>
+                    {msg.type === "image" ? (
+                      <img src={msg.text} alt="shared" width="200" />
+                    ) : msg.type === "video" ? (
+                      <video src={msg.text} controls width="250" />
+                    ) : msg.type === "audio" ? (
+                      <audio src={msg.text} controls />
+                    ) : (
+                      <p>{msg.text}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -206,9 +242,36 @@ export default function Chatroom() {
           </div>
           <button className="chatbutton">^</button>
           <div className="abar">
-            {/* <img src="../../public/icon/image-gallery.png" alt="add image" />
-            <img src="../../public/icon/video.png" alt="add video" />
-            <img src="../../public/icon/equalizer.png" alt="add audio" /> */}
+            <label htmlFor="uplodeimage">
+              <img src="../../public/icon/image-gallery.png" />
+              <input
+                type="file"
+                id="uplodeimage"
+                name="uplodeimage"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+            </label>
+            <label htmlFor="uplodeivideo">
+              <img src="../../public/icon/video.png" />
+              <input
+                type="file"
+                id="uplodeivideo"
+                name="uplodeivideo"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+            </label>
+            <label htmlFor="uplodeaudio">
+              <img src="../../public/icon/equalizer.png" />
+              <input
+                type="file"
+                id="uplodeaudio"
+                name="uplodeaudio"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+            </label>
           </div>
           <input
             placeholder="Enter Your Message ..."

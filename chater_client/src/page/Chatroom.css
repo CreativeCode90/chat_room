@@ -80,6 +80,7 @@
   }
 }
 
+
 #optionbar{
   border-right: 1px solid rgba(255, 255, 255, 0.582);
 
@@ -107,7 +108,8 @@
   align-items: end;
   height: 80%;
   overflow-y: auto;
-  padding: 5px;
+  padding: 10px;
+  padding-right: 10px;
    box-sizing: border-box;
 }
 
@@ -115,7 +117,7 @@
   width: 1px;
 }
 .User_title{
-  font-size: 12px;
+  font-size: 7px;
   font-weight: bold;
   text-transform: capitalize;
   color: rgba(255, 255, 255, 0.548);
@@ -129,7 +131,7 @@
 
 .optbatch{
   color: rgba(255, 255, 255, 0.366);
-  font-size: 12px;
+  font-size: 9px;
   margin-top: 5px;
   text-transform: capitalize;
   font-weight: 700;
@@ -143,12 +145,13 @@
   li{
     display: flex;
     gap: 5px;
+    font-size: 8px;
   }
 }
 
 .other_user_name{
   text-transform: capitalize;
-  font-size: 12px;
+  font-size: 8px;
   color:#F22BC4 ;
 }
 

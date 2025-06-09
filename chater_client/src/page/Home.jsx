@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const socket = io.connect("https://chatter-server-xpoi.onrender.com");
-
+const socket = io.connect("http://localhost:3001");
 export default function Home() {
   const { username } = useParams();
   const navigate = useNavigate();

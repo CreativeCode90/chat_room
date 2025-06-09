@@ -2,48 +2,26 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
+import multer from "multer";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import fs from "fs";
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 
-// Configure CORS for Express
-app.use(cors({
-  origin: [
-    "https://chatterclientapp.onrender.com",
-    "http://localhost:5173"
-  ]
-}));
+const activeUsers = {}; // Stores information about currently connected users
+const activeRooms = {}; // Stores information about active chat rooms
 
-// Serve static files from the Vite React build
-app.use(express.static(path.join(__dirname, "../chater_client/dist")));
-
-// Handle client-side routing (React Router)
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../chater_client/dist", "index.html"));
-});
-
-// Create a new socket.io server
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://chatterclientapp.onrender.com",
-      "http://localhost:5173"
-    ],
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
 });
 
-// In-memory storage
-const activeUsers = {};
-const activeRooms = {};
-
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  // console.log("User connected:", socket.id);
 
   socket.on("user_login", (userData) => {
     console.log("User logged in:", userData.username);
@@ -56,13 +34,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join_new_room", (newRoomData) => {
-    const roomId = newRoomData.CreateNewMeeting.roomid;  // fixed typo here
-    const creater = newRoomData.CreateNewMeeting.creater;
+    const roomId = newRoomData.CreateNewMetting.roomid;
 
     if (!activeRooms[roomId]) {
       activeRooms[roomId] = {
         roomId,
-        creater,
+        creater: newRoomData.CreateNewMetting.creater,
         participates: [],
         createdAt: new Date(),
       };
@@ -76,16 +53,17 @@ io.on("connection", (socket) => {
 
     if (!activeRooms[roomId]) return;
 
-    const participates = activeRooms[roomId].participates;
-    if (!participates.includes(username)) {
-      participates.push(username);
+    const participants = activeRooms[roomId].participates;
+
+    if (!participants.includes(username)) {
+      participants.push(username);
     }
 
     socket.join(roomId);
 
     io.to(roomId).emit("joined_room_participates_update", {
-      roomId,
-      participates,
+      roomId: roomId,
+      participate: participants,
     });
   });
 
@@ -97,14 +75,35 @@ io.on("connection", (socket) => {
       io.emit("get_msg", data.MessageSender);
     }
   });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-    delete activeUsers[socket.id];
-  });
 });
 
-const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Ensure uploads directory exists
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log("✅ Created uploads directory");
+}
+
+// Multer storage setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) =>
+    cb(null, `${Date.now()}-${file.originalname}`),
+});
+
+const upload = multer({ storage });
+
+app.use("/uploads", express.static("uploads")); // serve uploaded files
+
+// Upload route
+app.post("/upload", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  const fileUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+  res.json({ fileUrl });
+});
+
+server.listen(3001, () => {
+  console.log("Server is running on port 3001");
 });

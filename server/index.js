@@ -15,7 +15,7 @@ const activeRooms = {}; // Stores information about active chat rooms
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://chatterroom.onrender.com",
     methods: ["GET", "POST"],
   },
 });

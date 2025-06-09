@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const socket = io.connect("http://localhost:3001");
+// const socket = io.connect("http://localhost:3001");
+const socket = io.connect("https://chat-room-nj2t.onrender.com");
 export default function Home() {
   const { username } = useParams();
   const navigate = useNavigate();

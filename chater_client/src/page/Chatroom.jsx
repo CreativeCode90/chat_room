@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import "./Chatroom.css";
 import { io } from "socket.io-client";
 
-const socket = io.connect("http://localhost:3001");
+// const socket = io.connect("http://localhost:3001");
+const socket = io.connect("https://chat-room-nj2t.onrender.com");
 
 export default function Chatroom() {
   const { username, roomId } = useParams();
